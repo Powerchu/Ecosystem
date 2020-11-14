@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{1e994cab-f83e-495d-ae8f-caefe78355c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\imgui">
+      <UniqueIdentifier>{e1ce981e-0bb5-4e50-9923-3b9a207a5d4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\glfw">
+      <UniqueIdentifier>{c6b686b2-2b73-46f6-b9a8-c7926b4c6d18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\gl3w">
+      <UniqueIdentifier>{de5e1e62-1edf-4f47-8424-f6b5e87ed9de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header\EcoSystem">
+      <UniqueIdentifier>{0d1c5e70-92e1-4ec2-a3e3-e79d17de3b3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\EcoSystem">
+      <UniqueIdentifier>{2b6e25f5-28e5-40ba-9af7-4d29f9885407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Creature">
+      <UniqueIdentifier>{579d7b1c-9a96-4721-bcef-fda0915e79ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Creature">
+      <UniqueIdentifier>{d868c1d6-2016-4bf1-878c-1d3e5b6dae6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\EcoSystem\Tools">
+      <UniqueIdentifier>{47fb7c1d-3661-488d-8a8e-456c0749933b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\EcoSystem\Tools">
+      <UniqueIdentifier>{7a612221-6057-46f8-b82a-a0ef02f52f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Data">
+      <UniqueIdentifier>{2a714e12-f64c-46e5-99ab-81add7a01aa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Data">
+      <UniqueIdentifier>{559173bc-6084-406a-ae6e-c0445e00c848}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\libs\gl3w\GL\gl3w.c">
+      <Filter>Dependencies\gl3w</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui_widgets.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui_demo.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui_draw.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui_impl_glfw.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui_impl_opengl3.cpp">
+      <Filter>Dependencies\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\EcoSystem.cpp">
+      <Filter>Source\EcoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Creatures\Creature.cpp">
+      <Filter>Source\Creature</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\Tools\Tools.cpp">
+      <Filter>Source\EcoSystem\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Data\EcoData.cpp">
+      <Filter>Source\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\Tools\SpawnTool.cpp">
+      <Filter>Source\EcoSystem\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Creatures\Rabbit.cpp">
+      <Filter>Source\Creature</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\Terrain.cpp">
+      <Filter>Source\EcoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\Tools\ViewerTool.cpp">
+      <Filter>Source\EcoSystem\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EcoSystem\Tools\LogTool.cpp">
+      <Filter>Source\EcoSystem\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Creatures\Fox.cpp">
+      <Filter>Source\Creature</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dependencies\libs\glfw\include\GLFW\glfw3.h">
+      <Filter>Dependencies\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\libs\glfw\include\GLFW\glfw3native.h">
+      <Filter>Dependencies\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\libs\gl3w\GL\glcorearb.h">
+      <Filter>Dependencies\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\libs\gl3w\GL\gl3w.h">
+      <Filter>Dependencies\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imstb_truetype.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imconfig.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui_impl_glfw.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui_impl_opengl3.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui_internal.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imstb_rectpack.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imstb_textedit.h">
+      <Filter>Dependencies\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\EcoSystem.h">
+      <Filter>Header\EcoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Creatures\Creature.h">
+      <Filter>Header\Creature</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\Tools\Tools.h">
+      <Filter>Header\EcoSystem\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Data\EcoData.h">
+      <Filter>Header\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\Tools\SpawnTool.h">
+      <Filter>Header\EcoSystem\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Creatures\Rabbit.h">
+      <Filter>Header\Creature</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\Terrain.h">
+      <Filter>Header\EcoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\Tools\ViewerTool.h">
+      <Filter>Header\EcoSystem\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EcoSystem\Tools\LogTool.h">
+      <Filter>Header\EcoSystem\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Creatures\Fox.h">
+      <Filter>Header\Creature</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
