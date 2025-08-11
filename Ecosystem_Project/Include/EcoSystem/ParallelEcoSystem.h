@@ -52,7 +52,7 @@ class ParallelEcoSystem : public EcoSystem {
   float AttemptPredationThreadSafe(Creature* predator, Creature* prey);
 
  private:
-  ParallelEcoSystem() : EcoSystem(), thread_pool_(nullptr), initialized_(false) {}
+  ParallelEcoSystem() : EcoSystem(64, 64, 32), thread_pool_(nullptr), initialized_(false) {}
 
   // Threading infrastructure
   std::unique_ptr<Utils::Threading::ThreadPool> thread_pool_;

@@ -63,6 +63,9 @@ void ParallelEcoSystem::ParallelUpdate(float dt) noexcept {
     InitializeParallel();
   }
 
+  // Update delta time (same as base EcoSystem::Update)
+  mfDelta = (dt * mfTimeStep);
+
   auto start_time = std::chrono::high_resolution_clock::now();
 
   if (mbRunEco) {
@@ -81,7 +84,10 @@ void ParallelEcoSystem::ParallelUpdate(float dt) noexcept {
     // Phase 5: Cleanup dead creatures
     ParallelCleanupDead();
 
-    // Phase 6: Update tools and logs (existing single-threaded code)
+    // Phase 6: Update map (same as base EcoSystem)
+    UpdateMap();
+
+    // Phase 7: Update tools and logs (existing single-threaded code)
     if (mbEcoTool) EcoTool();
     UpdateTools();
 
