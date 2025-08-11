@@ -239,13 +239,19 @@ void Ecosystem::EcoSystem::EcoTool(void) {
 }
 
 void Ecosystem::EcoSystem::UpdateMap(void) {
-  unsigned x, y;
-  for (auto& row : mTerrain.GetSpaceLayer())
-    for (auto& col : row) col = -1;
+  // Optimize space layer clearing - use memset or fill for better cache performance
+  auto& space_layer = mTerrain.GetSpaceLayer();
+  for (auto& row : space_layer) {
+    std::fill(row.begin(), row.end(), -1);
+  }
 
-  for (int i = 0; i < static_cast<int>(mAllCreatures.size()); ++i) {
+  // Cache creature count to avoid repeated size() calls
+  const size_t creature_count = mAllCreatures.size();
+  unsigned x, y;
+  
+  for (size_t i = 0; i < creature_count; ++i) {
     mAllCreatures[i]->GetGridPosition(x, y);
-    mTerrain.GetSpaceLayer()[y][x] = i;
+    space_layer[y][x] = static_cast<int>(i);
   }
 }
 
@@ -258,30 +264,46 @@ void Ecosystem::EcoSystem::UpdateTools(void) {
 }
 
 void Ecosystem::EcoSystem::UpdateCreatures(float _dt) const {
-  for (auto& c : mAllCreatures) {
-    if (c->GetFlags() & Ecosystem::Creature::FLAG_DEAD) continue;
-
-    c->UpdateAwake(_dt);
+  // Use range-based for with caching and early exit optimizations
+  const auto dead_flag = Ecosystem::Creature::FLAG_DEAD;
+  
+  for (const auto& creature : mAllCreatures) {
+    // Most creatures are alive - compiler will optimize this branch
+    if (!(creature->GetFlags() & dead_flag)) {
+      creature->UpdateAwake(_dt);
+    }
   }
 }
 
 void Ecosystem::EcoSystem::CleanUpDead(void) {
-  for (unsigned i = 0; i < mAllCreatures.size(); ++i) {
-    if (mAllCreatures[i]->GetFlags() & Ecosystem::Creature::FLAG_DEAD) {
-      auto p = mAllCreatures[i]->GetGridPosition();
+  // Optimize dead creature cleanup with reverse iteration to avoid index adjustment
+  const auto dead_flag = Ecosystem::Creature::FLAG_DEAD;
+  auto& space_layer = mTerrain.GetSpaceLayer();
+  auto& fertilizer_layer = mTerrain.GetFertilizerLayer();
+  
+  // Use reverse iteration to safely remove elements
+  for (int i = static_cast<int>(mAllCreatures.size()) - 1; i >= 0; --i) {
+    const auto creature = mAllCreatures[i];
+    
+    if (creature->GetFlags() & dead_flag) {
+      const auto pos = creature->GetGridPosition();
 
-      // check if he died with somebody else on it or naturally
-      if (mTerrain.GetSpaceLayer()[p.y][p.x] == static_cast<int>(i))
-        mTerrain.GetSpaceLayer()[p.y][p.x] = -1;
+      // Check if creature died naturally (not eaten by another)
+      if (space_layer[pos.y][pos.x] == i) {
+        space_layer[pos.y][pos.x] = -1;
+      }
 
-      mTerrain.GetFertilizerLayer()[p.y][p.x] +=
-          mAllCreatures[i]->GetEnergy().second * mfDeathThresh;
+      // Add creature's remaining energy as fertilizer
+      fertilizer_layer[pos.y][pos.x] += 
+          creature->GetEnergy().second * mfDeathThresh;
 
-      std::swap(mAllCreatures[i], mAllCreatures.back());
-      Creature* c = mAllCreatures.back();
+      // Efficient removal: swap with last element and pop
+      if (i != static_cast<int>(mAllCreatures.size()) - 1) {
+        std::swap(mAllCreatures[i], mAllCreatures.back());
+      }
+      
+      delete creature;
       mAllCreatures.pop_back();
-      delete c;
-      --i;
     }
   }
 }

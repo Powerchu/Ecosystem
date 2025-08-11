@@ -1,6 +1,7 @@
 #include "Creatures/Creature.h"
 #include "Data/EcoData.h"
 #include "EcoSystem/EcoSystem.h"
+#include "Utils/Math.h"
 #include "Utils/UUID.h"
 #include "imgui.h"
 
@@ -221,12 +222,16 @@ void Ecosystem::Creature::SetMovement(const std::vector<GridPos>& _path) {
 void Ecosystem::Creature::Move(float _dt) {
   mfAccPathDt += _dt;
 
-  int euc = (mCurPath.front().x - static_cast<int>(mnPosX)) *
-                (mCurPath.front().x - static_cast<int>(mnPosX)) +
-            (mCurPath.front().y - static_cast<int>(mnPosY)) *
-                (mCurPath.front().y - static_cast<int>(mnPosY));
-
-  float tReq = sqrt(static_cast<float>(euc)) / (mTraits.mfSpeed);
+  // Cache current position to avoid repeated casts
+  const float curr_x = static_cast<float>(mnPosX);
+  const float curr_y = static_cast<float>(mnPosY);
+  
+  // Calculate distance using optimized math
+  const float dx = static_cast<float>(mCurPath.front().x) - curr_x;
+  const float dy = static_cast<float>(mCurPath.front().y) - curr_y;
+  
+  // Use fast sqrt for movement calculations
+  float tReq = Utils::Math::FastSqrt(dx * dx + dy * dy) / mTraits.mfSpeed;
 
   while (mfAccPathDt > tReq) {
     mfAccPathDt -= tReq;
@@ -237,11 +242,12 @@ void Ecosystem::Creature::Move(float _dt) {
     mCurPath.pop_front();
     if (mCurPath.empty()) break;
 
-    euc = (mCurPath.front().x - static_cast<int>(mnPosX)) *
-              (mCurPath.front().x - static_cast<int>(mnPosX)) +
-          (mCurPath.front().y - static_cast<int>(mnPosY)) *
-              (mCurPath.front().y - static_cast<int>(mnPosY));
-    tReq = sqrt(static_cast<float>(euc)) / (mTraits.mfSpeed);
+    // Recalculate for next waypoint
+    const float new_curr_x = static_cast<float>(mnPosX);
+    const float new_curr_y = static_cast<float>(mnPosY);
+    const float new_dx = static_cast<float>(mCurPath.front().x) - new_curr_x;
+    const float new_dy = static_cast<float>(mCurPath.front().y) - new_curr_y;
+    tReq = Utils::Math::FastSqrt(new_dx * new_dx + new_dy * new_dy) / mTraits.mfSpeed;
   }
 }
 

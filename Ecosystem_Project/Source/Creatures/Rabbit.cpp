@@ -1,5 +1,6 @@
 #include "Creatures/Rabbit.h"
 #include "EcoSystem/EcoSystem.h"
+#include "Utils/Random.h"
 #include "imgui.h"
 
 Ecosystem::Rabbit::Rabbit(const Traits& _t, unsigned _id) noexcept
@@ -45,8 +46,8 @@ void Ecosystem::Rabbit::UpdateAwakeBehaviour(float) {
       while (!valid) {
         int prevX = randX;
         int prevY = randY;
-        randX = rand() % 8;
-        randY = rand() % 8;
+        randX = Utils::Random::RandomInt(0, 7);
+        randY = Utils::Random::RandomInt(0, 7);
         if (prevX == randX || prevY == randY) {
           continue;
         }

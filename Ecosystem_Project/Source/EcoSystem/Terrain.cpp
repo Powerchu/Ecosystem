@@ -1,4 +1,6 @@
 #include "EcoSystem/Terrain.h"
+#include "Utils/Math.h"
+#include "Utils/Random.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -36,9 +38,8 @@ T Lerp(T _from, T _to, float _a) {
   return _from + (_to - _from) * _a;
 }
 
-float GetOctileCost(float x, float y) {
-  return Max(x, y) + (SQRT_2 - 1) * Min(x, y);
-}
+// Use optimized octile distance from math utils
+// Remove this function as it's replaced by Utils::Math::OctileDistance
 
 Ecosystem::GridPos::GridPos(int _x, int _y) noexcept : x{_x}, y{_y} {}
 
@@ -108,17 +109,22 @@ void Ecosystem::Terrain::Init(float _iga, float _igl, float _igh, unsigned _w,
   for (auto& sub : mFertilizerThresh)
     sub.resize(mnWidth, std::make_pair(0.f, _fm));
 
-  // normalize gradient towards centre of grid
+  // normalize gradient towards centre of grid - optimized
   std::uniform_real_distribution<float> dist{};
-  unsigned centreRow = mnHeight / 2;
-  unsigned centreCol = mnWidth / 2;
-  float maxD =
-      sqrtf(static_cast<float>(centreRow * centreRow + centreCol * centreCol));
+  const float centre_x = static_cast<float>(mnWidth) * 0.5f;
+  const float centre_y = static_cast<float>(mnHeight) * 0.5f;
+  const float max_dist_sq = centre_x * centre_x + centre_y * centre_y;
+  const float inv_max_dist = 1.0f / std::sqrt(max_dist_sq);
+  
   for (unsigned i = 0; i < mnHeight; ++i) {
     for (unsigned j = 0; j < mnWidth; ++j) {
-      float d = sqrtf(static_cast<float>((centreRow - i) * (centreRow - i) +
-                                         (centreCol - j) * (centreCol - j)));
-      mFertilizerThresh[i][j].first = 1.f - d / maxD;
+      const float dx = static_cast<float>(j) - centre_x;
+      const float dy = static_cast<float>(i) - centre_y;
+      const float dist_sq = dx * dx + dy * dy;
+      
+      // Use optimized distance calculation
+      const float normalized_dist = Utils::Math::FastSqrt(dist_sq) * inv_max_dist;
+      mFertilizerThresh[i][j].first = 1.0f - normalized_dist;
       mFertilizerLayer[i][j] =
           mFertilizerThresh[i][j].first * mFertilizerThresh[i][j].second;
     }
@@ -349,15 +355,17 @@ Ecosystem::GridPos Ecosystem::Terrain::GetBestGrassPos(
         _minAlpha)
       result.push_back(cur->pos);
 
-    if (static_cast<float>(
-            sqrt((cur->pos.x - _src.x) * (cur->pos.x - _src.x) +
-                 (cur->pos.y - _src.y) * (cur->pos.y - _src.y))) < _limit)
+    // Use squared distance comparison to avoid sqrt
+    const float dx = static_cast<float>(cur->pos.x - _src.x);
+    const float dy = static_cast<float>(cur->pos.y - _src.y);
+    const float dist_sq = dx * dx + dy * dy;
+    const float limit_sq = _limit * _limit;
+    
+    if (dist_sq < limit_sq)
       for (auto& n : getNeigh(cur->pos, mNodeLayer, cur->fcost)) q.push(n);
   }
 
-  std::random_device rd;
-  std::mt19937 g(rd());
-  std::shuffle(result.begin(), result.end(), g);
+  Utils::Random::Shuffle(result);
   if (result.size()) {
     unsigned highestId = 0;
     float highestV = mGrassLayer[result[0].y][result[0].x] /
@@ -386,10 +394,10 @@ std::vector<Ecosystem::Node*> Ecosystem::Terrain::GetNeighbours(
           static_cast<unsigned>(_src.y + j) >= mnHeight)
         continue;
 
-      float x = static_cast<float>(abs(_dest.x - (_src.x + i)));
-      float y = static_cast<float>(abs(_dest.y - (_src.y + j)));
+      const float dx = static_cast<float>(_dest.x - (_src.x + i));
+      const float dy = static_cast<float>(_dest.y - (_src.y + j));
 
-      float h = GetOctileCost(x, y);
+      const float h = Utils::Math::OctileDistance(dx, dy);
       if (mNodeLayer[_src.y + j][_src.x + i].fcost <=
           h + ((!i || !j) ? _curT + 1 : _curT + SQRT_2))
         continue;
@@ -410,9 +418,7 @@ std::vector<Ecosystem::Node*> Ecosystem::Terrain::GetNeighbours(
       result.push_back(&mNodeLayer[_src.y + j][_src.x + i]);
     }
   }
-  std::random_device rd;
-  std::mt19937 g(rd());
-  std::shuffle(result.begin(), result.end(), g);
+  Utils::Random::Shuffle(result);
   return result;
 }
 
