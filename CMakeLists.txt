@@ -47,13 +47,14 @@ add_executable(EcosystemProject
     # Data
     Ecosystem_Project/Source/Data/EcoData.cpp
     
-    # ImGui sources
-    Ecosystem_Project/Dependencies/imgui.cpp
-    Ecosystem_Project/Dependencies/imgui_demo.cpp
-    Ecosystem_Project/Dependencies/imgui_draw.cpp
-    Ecosystem_Project/Dependencies/imgui_widgets.cpp
-    Ecosystem_Project/Dependencies/imgui_impl_glfw.cpp
-    Ecosystem_Project/Dependencies/imgui_impl_opengl3.cpp
+    # ImGui sources (from submodule)
+    external/imgui/imgui.cpp
+    external/imgui/imgui_demo.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+    external/imgui/backends/imgui_impl_glfw.cpp
+    external/imgui/backends/imgui_impl_opengl3.cpp
     
     # GL3W
     Ecosystem_Project/Dependencies/libs/gl3w/GL/gl3w.c
@@ -65,6 +66,8 @@ target_include_directories(EcosystemProject PRIVATE
     Ecosystem_Project/Dependencies
     Ecosystem_Project/Dependencies/libs/gl3w
     Ecosystem_Project/Dependencies/libs/glfw/include
+    external/imgui
+    external/imgui/backends
 )
 
 # Link libraries

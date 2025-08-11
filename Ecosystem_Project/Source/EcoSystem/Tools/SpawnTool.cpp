@@ -33,20 +33,21 @@ void Ecosystem::SpawnTool::Render(void) noexcept {
     ImGui::DragInt("Y ", &mnSpawnY, 1.f, 0, eco.GetHeight() - 1);
     unsigned short x = static_cast<unsigned short>(mnSpawnX);
     unsigned short y = static_cast<unsigned short>(mnSpawnY);
-    if (ImGui::ButtonEx(
-            "Spawn", ImVec2{80, 30},
-            (eco.GetGridVal(x, y) == -1 ? 0 : ImGuiButtonFlags_Disabled))) {
+    bool can_spawn = (eco.GetGridVal(x, y) == -1);
+    if (!can_spawn) ImGui::BeginDisabled();
+    if (ImGui::Button("Spawn", ImVec2{80, 30})) {
       Data::VisitSpawnTuple(
           Data::SpawnVisitor{x, y, EvolutionChart[mnCurrSelection],
                              Traits{mfCurSize, mfCurSpeed, mfCurSense}},
           mnCurrSelection);
     }
+    if (!can_spawn) ImGui::EndDisabled();
     eco.HighlightGrid(x, y, ImGui::GetColorU32({1.f, 0.f, 0.f, 0.5f}));
   }
 
   if (ImGui::CollapsingHeader("Multiple")) {
     ImGui::DragInt("Count ", &mnSpawnCount, 1.f, 1, 100);
-    if (ImGui::ButtonEx("Batch Spawn", ImVec2{80, 30})) {
+    if (ImGui::Button("Batch Spawn", ImVec2{80, 30})) {
       std::random_device rd;
       std::mt19937 mt(rd());
       for (int i = 0; i < mnSpawnCount; ++i) {

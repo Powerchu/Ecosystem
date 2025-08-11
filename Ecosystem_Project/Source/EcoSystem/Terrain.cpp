@@ -254,7 +254,7 @@ unsigned int Ecosystem::Terrain::GetGrassColor(unsigned _x,
   float r = mGrassLayer[_y][_x] /
             (mGrassThresh[_y][_x].second - mGrassThresh[_y][_x].first);
   return ImGui::GetColorU32(
-      Lerp(ImVec4{0.f, 0.3f, 0.f, 0.5f}, ImVec4{0.f, 0.9f, 0.f, 0.8f}, r));
+      ImLerp(ImVec4{0.f, 0.3f, 0.f, 0.5f}, ImVec4{0.f, 0.9f, 0.f, 0.8f}, r));
 }
 
 std::vector<Ecosystem::GridPos> Ecosystem::Terrain::GetShortestPath(

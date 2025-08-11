@@ -103,7 +103,7 @@ void Ecosystem::EcoSystem::AddCreature(Ecosystem::Creature* _c) {
 
 void Ecosystem::EcoSystem::RenderMap(void) {
   ImGui::SetNextWindowPos(ImVec2{0.f, 0.f}, ImGuiCond_Always);
-  ImGui::SetNextWindowSize(ImVec2{mnWindowX, mnWindowY}, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(ImVec2{static_cast<float>(mnWindowX), static_cast<float>(mnWindowY)}, ImGuiCond_Always);
   ImGui::Begin("Simulation Space", nullptr,
                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
                    ImGuiWindowFlags_NoMove |
