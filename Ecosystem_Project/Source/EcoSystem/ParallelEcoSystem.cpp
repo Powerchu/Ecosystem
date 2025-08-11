@@ -1,6 +1,9 @@
 #include "EcoSystem/ParallelEcoSystem.h"
 #include "Creatures/Creature.h"
 #include "Creatures/ThreadSafeCreatures.h"
+#include "EcoSystem/Tools/SpawnTool.h"
+#include "EcoSystem/Tools/ViewerTool.h"
+#include "EcoSystem/Tools/LogTool.h"
 #include "Utils/Math.h"
 #include "Utils/Random.h"
 #include <algorithm>
@@ -20,6 +23,22 @@ std::chrono::high_resolution_clock::time_point
 ParallelEcoSystem& ParallelEcoSystem::GetInst() noexcept {
   static ParallelEcoSystem instance;
   return instance;
+}
+
+void ParallelEcoSystem::Init() noexcept {
+  // Create tools for this parallel ecosystem instance
+  // Note: We can't use Data::MakeTools() as it calls EcoSystem::GetInst()
+  
+  // Clear any existing tools
+  for (auto* tool : mTools) {
+    delete tool;
+  }
+  mTools.clear();
+  
+  // Create tools specific to this instance
+  AddTools(new SpawnTool{});
+  AddTools(new ViewTool{});
+  AddTools(new LogTool{});
 }
 
 void ParallelEcoSystem::InitializeParallel(size_t num_threads) {
@@ -69,14 +88,20 @@ void ParallelEcoSystem::ParallelUpdate(float dt) noexcept {
   auto start_time = std::chrono::high_resolution_clock::now();
 
   if (mbRunEco) {
+    // Debug: Confirm simulation is running
+    static bool first_run = true;
+    if (first_run) {
+      printf("✅ Parallel ecosystem simulation started!\n");
+      first_run = false;
+    }
     // Phase 1: Update spatial partitions
     UpdateSpatialPartitions();
 
-    // Phase 2: Parallel terrain update
-    ParallelUpdateTerrain(dt);
+    // Phase 2: Parallel terrain update  
+    ParallelUpdateTerrain(mfDelta);
 
     // Phase 3: Parallel creature updates
-    ParallelUpdateCreatures(dt);
+    ParallelUpdateCreatures(mfDelta);
 
     // Phase 4: Process interactions (serialized for consistency)
     ProcessInteractions();
@@ -96,6 +121,12 @@ void ParallelEcoSystem::ParallelUpdate(float dt) noexcept {
 
     RenderMap();
   } else {
+    // Debug: Confirm setup screen is being shown
+    static bool setup_shown = false;
+    if (!setup_shown) {
+      printf("🔧 Showing parallel ecosystem setup screen - click 'Begin!' to start simulation\n");
+      setup_shown = true;
+    }
     RenderSetup();
   }
 

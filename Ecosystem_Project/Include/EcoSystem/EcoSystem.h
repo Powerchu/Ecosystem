@@ -25,7 +25,7 @@ class EcoSystem {
   static EcoSystem& GetInst(void) noexcept;
   ~EcoSystem(void) noexcept;
 
-  void Init(void) noexcept;
+  virtual void Init(void) noexcept;
 
   void UpdateWindowSize(int, int) noexcept;
   void Update(float) noexcept;

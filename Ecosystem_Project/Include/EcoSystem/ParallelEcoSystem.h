@@ -14,6 +14,9 @@ class ParallelEcoSystem : public EcoSystem {
  public:
   static ParallelEcoSystem& GetInst() noexcept;
 
+  /// @brief Initialize parallel ecosystem and create tools
+  void Init() noexcept;
+
   /// @brief Initialize parallel system with thread count
   /// @param num_threads Number of worker threads (0 = auto-detect)
   void InitializeParallel(size_t num_threads = 0);
