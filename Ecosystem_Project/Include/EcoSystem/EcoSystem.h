@@ -20,7 +20,7 @@ enum LogTypes {
   LAST
 };
 
-class EcoSystem final {
+class EcoSystem {
  public:
   static EcoSystem& GetInst(void) noexcept;
   ~EcoSystem(void) noexcept;
@@ -68,7 +68,7 @@ class EcoSystem final {
 
   unsigned mnPeakPops;
 
- private:
+ protected:
   EcoSystem(unsigned _w = 0, unsigned _h = 0, unsigned _s = 1) noexcept;
 
   unsigned mnLogWindow;
@@ -120,6 +120,8 @@ class EcoSystem final {
   void UpdateLogs(void) noexcept;
   void EcoTool(void);
   void CleanUpDead(void);
+
+ private:
 };
 
 template <typename T, typename SFNAE>

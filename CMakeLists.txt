@@ -32,6 +32,7 @@ add_executable(EcosystemProject
     # Ecosystem sources
     Ecosystem_Project/Source/EcoSystem/EcoSystem.cpp
     Ecosystem_Project/Source/EcoSystem/Terrain.cpp
+    Ecosystem_Project/Source/EcoSystem/ParallelEcoSystem.cpp
     
     # Tools
     Ecosystem_Project/Source/EcoSystem/Tools/LogTool.cpp
@@ -43,12 +44,14 @@ add_executable(EcosystemProject
     Ecosystem_Project/Source/Creatures/Creature.cpp
     Ecosystem_Project/Source/Creatures/Fox.cpp
     Ecosystem_Project/Source/Creatures/Rabbit.cpp
+    Ecosystem_Project/Source/Creatures/ThreadSafeCreatures.cpp
     
     # Data
     Ecosystem_Project/Source/Data/EcoData.cpp
     
     # Utils
     Ecosystem_Project/Source/Utils/UUID.cpp
+    Ecosystem_Project/Source/Utils/Threading.cpp
     
     # ImGui sources (from submodule)
     external/imgui/imgui.cpp
