@@ -47,6 +47,9 @@ add_executable(EcosystemProject
     # Data
     Ecosystem_Project/Source/Data/EcoData.cpp
     
+    # Utils
+    Ecosystem_Project/Source/Utils/UUID.cpp
+    
     # ImGui sources (from submodule)
     external/imgui/imgui.cpp
     external/imgui/imgui_demo.cpp

@@ -1,9 +1,9 @@
 #include "Creatures/Creature.h"
 #include "Data/EcoData.h"
 #include "EcoSystem/EcoSystem.h"
+#include "Utils/UUID.h"
 #include "imgui.h"
 
-#include <time.h>
 #include <functional>
 #include <random>
 #include <utility>
@@ -19,19 +19,6 @@ float GetActionCost(float size, float speed, float sense, float energy,
               ((2 * pow(size, 2) * speed * speed + sense + size) + energy) +
           (gActionCost[e] / 2) * energy) *
          _modifier;
-}
-
-std::string RandomString(int len) {
-  std::srand(static_cast<unsigned int>(time(NULL)));
-  std::string str =
-      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  std::string newstr;
-  int pos;
-  while (newstr.size() != static_cast<size_t>(len)) {
-    pos = ((std::rand() % (str.size() - 1)));
-    newstr += str.substr(pos, 1);
-  }
-  return newstr;
 }
 }  // namespace
 
@@ -76,7 +63,7 @@ Ecosystem::Creature::Creature(const std::string& _name, unsigned short _flags,
                               const Traits& _t, unsigned _id) noexcept
     : mBitFlags{_flags},
       mName{_name},
-      mUniqueID{RandomString(16)},
+      mUniqueID{Utils::UUID::Generate()},
       mnColorCode{},
       mnChartID{_id},
       mfFatigue{std::make_pair(0.f, 0.f)},
