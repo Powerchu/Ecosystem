@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "imgui.h"
+#include "imgui_internal.h"  // For DockBuilder functions
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
@@ -145,9 +146,21 @@ int main(int, char**) {
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
   (void)io;
+  
+  // Enable docking
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
+  
+  // When viewports are enabled we tweak WindowRounding/WindowBg 
+  // so platform windows can look identical to regular ones.
+  ImGuiStyle& style = ImGui::GetStyle();
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    style.WindowRounding = 0.0f;
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+  }
 
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -175,6 +188,84 @@ int main(int, char**) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    
+    // Create the main dockspace
+    static bool opt_fullscreen = true;
+    static bool opt_padding = false;
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+    // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+    // because it would be confusing to have two docking targets within each others.
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    if (opt_fullscreen) {
+      const ImGuiViewport* viewport = ImGui::GetMainViewport();
+      ImGui::SetNextWindowPos(viewport->WorkPos);
+      ImGui::SetNextWindowSize(viewport->WorkSize);
+      ImGui::SetNextWindowViewport(viewport->ID);
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+      window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+      window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    } else {
+      dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+    }
+
+    // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+    // and handle the pass-thru hole, so we ask Begin() to not render a background.
+    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+      window_flags |= ImGuiWindowFlags_NoBackground;
+
+    // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+    // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+    // all active windows docked into it will lose their parent and become undocked.
+    // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+    // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+    if (!opt_padding)
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("EcosystemDockSpace", nullptr, window_flags);
+    if (!opt_padding)
+      ImGui::PopStyleVar();
+
+    if (opt_fullscreen)
+      ImGui::PopStyleVar(2);
+
+    // Submit the DockSpace
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+      ImGuiID dockspace_id = ImGui::GetID("EcosystemDockSpace");
+      ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+      
+      // Set up default docking layout on first run
+      static bool first_time = true;
+      if (first_time && ecosystem_initialized) {
+        first_time = false;
+        ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace); // create empty node
+        ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->WorkSize);
+
+        // Split the dockspace into a left and right area
+        ImGuiID dock_id_left, dock_id_right;
+        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.7f, &dock_id_left, &dock_id_right);
+        
+        // Further split the right area vertically for stacked tools (Adobe Photoshop style)
+        ImGuiID dock_id_right_top, dock_id_right_bottom;
+        ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Up, 0.33f, &dock_id_right_top, &dock_id_right_bottom);
+        
+        ImGuiID dock_id_right_middle;
+        ImGui::DockBuilderSplitNode(dock_id_right_bottom, ImGuiDir_Up, 0.5f, &dock_id_right_middle, &dock_id_right_bottom);
+
+        // Dock windows to their areas
+        ImGui::DockBuilderDockWindow("Ecosystem Grid", dock_id_left);
+        ImGui::DockBuilderDockWindow("SpawnTool", dock_id_right_top);
+        ImGui::DockBuilderDockWindow("View Tool", dock_id_right_middle);
+        ImGui::DockBuilderDockWindow("Logging", dock_id_right_bottom);
+        ImGui::DockBuilderDockWindow("EcoSystem", dock_id_right_bottom); // Same as Logging for tabs
+        
+        ImGui::DockBuilderFinish(dockspace_id);
+      }
+    }
+    
+    ImGui::End();
 
     // Show launcher if mode not selected
     if (selected_mode == EcosystemMode::NOT_SELECTED) {
@@ -234,6 +325,15 @@ int main(int, char**) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
+    // Update and Render additional Platform Windows
+    // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere)
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+      GLFWwindow* backup_current_context = glfwGetCurrentContext();
+      ImGui::UpdatePlatformWindows();
+      ImGui::RenderPlatformWindowsDefault();
+      glfwMakeContextCurrent(backup_current_context);
+    }
 
     glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);

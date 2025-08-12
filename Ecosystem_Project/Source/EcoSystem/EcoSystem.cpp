@@ -102,15 +102,9 @@ void Ecosystem::EcoSystem::AddCreature(Ecosystem::Creature* _c) {
 }
 
 void Ecosystem::EcoSystem::RenderMap(void) {
-  ImGui::SetNextWindowPos(ImVec2{0.f, 0.f}, ImGuiCond_Always);
-  ImGui::SetNextWindowSize(ImVec2{static_cast<float>(mnWindowX), static_cast<float>(mnWindowY)}, ImGuiCond_Always);
-  ImGui::Begin("Simulation Space", nullptr,
-               ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-                   ImGuiWindowFlags_NoMove |
-                   ImGuiWindowFlags_NoBringToFrontOnFocus |
-                   ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground |
-                   ImGuiWindowFlags_NoTitleBar);
-
+  // Render the ecosystem grid as a dockable window
+  ImGui::Begin("Ecosystem Grid");
+  
   RenderMenuBar();
   RenderGrid();
   RenderGridOverlay();
@@ -120,14 +114,23 @@ void Ecosystem::EcoSystem::RenderMap(void) {
 }
 
 void Ecosystem::EcoSystem::RenderGrid(void) {
-  ImRect bounds{ImVec2{6.f, mfTitleBarSize + 6.f},
-                ImVec2{static_cast<float>(mnWindowX) - 6.f,
-                       static_cast<float>(mnWindowY) - 6.f}};
+  // Get the available content region from the ImGui window
+  ImVec2 content_min = ImGui::GetWindowContentRegionMin();
+  ImVec2 content_max = ImGui::GetWindowContentRegionMax();
+  ImVec2 window_pos = ImGui::GetWindowPos();
+  
+  // Calculate actual bounds within the window
+  ImRect bounds{
+    ImVec2{window_pos.x + content_min.x + 6.f, window_pos.y + content_min.y + 6.f},
+    ImVec2{window_pos.x + content_max.x - 6.f, window_pos.y + content_max.y - 6.f}
+  };
 
   ImVec2 space{bounds.Max.x - bounds.Min.x, bounds.Max.y - bounds.Min.y};
   space.x /= static_cast<float>(mnWidth);
   space.y /= static_cast<float>(mnHeight);
-  mfScalar = min(min(space.x, space.y), static_cast<float>(mnScale));
+  
+  // Use the minimum of x and y to maintain square cells, remove scale limit for better scaling
+  mfScalar = min(space.x, space.y);
   ImVec2 box{bounds.Min.x + static_cast<float>(mfScalar),
              bounds.Min.y + static_cast<float>(mfScalar)};
 
@@ -152,9 +155,16 @@ void Ecosystem::EcoSystem::RenderGrid(void) {
 }
 
 void Ecosystem::EcoSystem::RenderGridOverlay(void) noexcept {
-  ImRect bounds{ImVec2{6.f, mfTitleBarSize + 6.f},
-                ImVec2{static_cast<float>(mnWindowX) - 6.f,
-                       static_cast<float>(mnWindowY) - 6.f}};
+  // Use the same bounds calculation as RenderGrid for consistency
+  ImVec2 content_min = ImGui::GetWindowContentRegionMin();
+  ImVec2 content_max = ImGui::GetWindowContentRegionMax();
+  ImVec2 window_pos = ImGui::GetWindowPos();
+  
+  ImRect bounds{
+    ImVec2{window_pos.x + content_min.x + 6.f, window_pos.y + content_min.y + 6.f},
+    ImVec2{window_pos.x + content_max.x - 6.f, window_pos.y + content_max.y - 6.f}
+  };
+  
   ImVec2 box{bounds.Min.x + static_cast<float>(mfScalar),
              bounds.Min.y + static_cast<float>(mfScalar)};
 
